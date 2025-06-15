@@ -1,6 +1,9 @@
-const app=require('./app');;
+const app=require('./app');
+const connectDB=require('./config/db-config')
 
 const PORT=process.env.PORT || 3000;
+
+connectDB();
 
 app.get('/',(req,res)=>{
     console.log("Hello from backend!")
