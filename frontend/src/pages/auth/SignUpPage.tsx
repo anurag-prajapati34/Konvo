@@ -1,6 +1,10 @@
+import { registerUser } from "@/redux/slices/authSlice";
+import type { AppDistpatch } from "@/redux/store";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const SignUpPage = () => {
+  const dispatch=useDispatch<AppDistpatch>();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,19 +16,21 @@ const SignUpPage = () => {
     email.trim();
     password.trim();
     if (fullName && email && password) {
-      //call the function to handle user signup
-      handleUserSignup();
+      dispatch(registerUser({
+        name:fullName,
+        email,
+        password
+      })).then((res)=>{
+        console.log("register dispatch response",res);
+      })
+    
+
     } else {
       // Handle error case
       alert("Please fill in all fields.");
     }
   };
 
-  const handleUserSignup = () => {
-    // This function can be used to handle user signup logic, such as making an API call to register the user.
-    // For now, it just logs the user data to the console.
-    console.log({ fullName, email, password });
-  };
   return (
     <div className="min-h-[100vh] w-full flex flex-col items-center justify-center ">
       <div className="bg-[var(--secondary-color)] shadow-2xl p-4 rounded-lg w-96  border-2 border-[var(--primary-color)]">
