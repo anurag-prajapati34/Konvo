@@ -1,7 +1,10 @@
 import { useState} from "react"
-
+import { useDispatch } from "react-redux";
+import type {AppDistpatch} from '../../redux/store'
+import { loginUser } from "@/redux/slices/authSlice";
 
 export const SignInPage = () => {
+  const dispatch=useDispatch<AppDistpatch>();
 
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -13,19 +16,20 @@ export const SignInPage = () => {
      email.trim();
      password.trim();
      if (email && password) {
-       //call the function to handle user singin
-       handleUserSignIn();
+    
+      dispatch(loginUser({
+        email,
+        password
+      })).then((res)=>{
+        console.log("User login dispatch response : ",res);
+      })
+
      } else {
        // Handle error case
        alert("Please fill in all fields.");
      }
    };
  
-   const handleUserSignIn= () => {
-     // This function can be used to handle user signin logic, such as making an API call to register the user.
-     // For now, it just logs the user data to the console.
-     console.log({  email, password });
-   };
   return (
     <div className='min-h-[100vh] w-full flex flex-col items-center justify-center '>
 
