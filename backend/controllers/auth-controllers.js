@@ -23,7 +23,23 @@ const registerUser = async (req, res) => {
         });
         await newUser.save();
 
-        console.log("User created successfully", newUser);
+        const token = jwt.sign(
+          { userId: newUser._id },
+          process.env.JWT_SECRET,
+          { expiresIn: "7d" }
+        );
+
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        console.log({
+          "user registered": newUser,
+          token: token,
+        });
 
         return res.status(201).json({
           success: true,
@@ -116,9 +132,9 @@ const logoutUser = async (req, res) => {
     });
 
     return res.status(200).json({
-        success:true,
-        message:"User loged out successfully"
-    })
+      success: true,
+      message: "User loged out successfully",
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -128,8 +144,34 @@ const logoutUser = async (req, res) => {
   }
 };
 
+const getLogedInUser = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User found successfully",
+      user: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
+  getLogedInUser,
 };
