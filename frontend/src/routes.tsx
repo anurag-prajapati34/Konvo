@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { SignInPage } from "./pages/auth/SignInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import App from "./App";
+import MessagePage from "./pages/MessagePage";
 
 const routes=createBrowserRouter([
 
@@ -16,6 +17,9 @@ const routes=createBrowserRouter([
     {
         path:"/sign-up",
         element:<SignUpPage/>
+    },{
+        path:'/message',
+        element:<MessagePage/>
     }
 ])
 
