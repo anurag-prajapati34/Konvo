@@ -6,5 +6,12 @@
   --primary-color:#6A4FC3;
   --secondry-color:#fff;
   --bg-color:#D9D9D9;
-  background-color: var(--bg-color);
+  /* background-color: var(--bg-color); */
+}
+
+.light{
+  background:white,
+}
+.dark{
+  background:black
 }
