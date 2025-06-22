@@ -3,12 +3,25 @@ import { SignInPage } from "./pages/auth/SignInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import App from "./App";
 import MessagePage from "./pages/MessagePage";
+import HomePage from "./pages/HomePage";
+import WelcomeChatScreen from "./components/WelcomeChatScreen";
+import ChatScreen from "./components/ChatScreen";
 
 const routes=createBrowserRouter([
 
     {
         path:"/",
-        element:<App/>
+        element:<HomePage/>,
+        children:[
+            {
+                path:'/',
+                element:<WelcomeChatScreen/>
+            },
+            {
+                path:'/chat',
+                element:<ChatScreen/>
+            }
+        ]
     },
     {
         path:"/sign-in",

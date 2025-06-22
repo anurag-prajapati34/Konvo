@@ -33,36 +33,36 @@ const navigate=useNavigate();
       });
   }, [dispatch]);
 
-  useEffect(() => {
-    socket.connect();
+  // useEffect(() => {
+  //   socket.connect();
 
-    socket.on("message", (message) => {
-      console.log("message", message);
-      setAllMessages((prevMessages) => [...prevMessages, message]);
-    });
+  //   socket.on("message", (message) => {
+  //     console.log("message", message);
+  //     setAllMessages((prevMessages) => [...prevMessages, message]);
+  //   });
 
-    socket.on("active-users", (res) => {
-      console.log("total active users are 👥", res);
-      console.log(typeof res);
-      setActiveUsers(res);
-    });
+  //   socket.on("active-users", (res) => {
+  //     console.log("total active users are 👥", res);
+  //     console.log(typeof res);
+  //     setActiveUsers(res);
+  //   });
 
-    socket.on("private-message",(data)=>{
+  //   socket.on("private-message",(data)=>{
 
-      console.log("private message ",data);
-      setPrivateMessages((prev)=>[...prev,data]);
-    })
+  //     console.log("private message ",data);
+  //     setPrivateMessages((prev)=>[...prev,data]);
+  //   })
 
-    socket.on("connect_error", (error: Error) => {
-      console.log("Socket connection error", error);
-    });
+  //   socket.on("connect_error", (error: Error) => {
+  //     console.log("Socket connection error", error);
+  //   });
 
-    return () => {
-      socket.off("active-users");
-      socket.off("message");
-      socket.off('private-message');
-    };
-  }, []);
+  //   return () => {
+  //     socket.off("active-users");
+  //     socket.off("message");
+  //     socket.off('private-message');
+  //   };
+  // }, []);
 
   return (
     <>
