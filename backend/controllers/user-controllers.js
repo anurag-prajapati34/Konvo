@@ -1,7 +1,7 @@
 const User = require("../models/user-model");
 const getUserProfile = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId=req.query?.userId;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
