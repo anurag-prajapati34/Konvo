@@ -1,6 +1,7 @@
 const express =require('express');
 const app=express();
 const authRoutes=require('./routes/authRoutes');
+const userRoutes=require('./routes/userRoutes')
 const cors=require('cors')
 const cookieParser=require('cookie-parser');
 const authenticate = require('./middlewares/authenticate');
@@ -22,5 +23,6 @@ app.get('/',authenticate,(req,res)=>{
 
 //auth
 app.use('/api/auth/user',authRoutes);
+app.use('/api/user',userRoutes);
 
 module.exports=app;

@@ -15,8 +15,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     bio:{
-      type:string,
-      default:'Hey there i am using Konvo !'
+      type:String,
+      default:"Hey there i am using Konvo !"
     },
     imageUrl: {
       type: String,
