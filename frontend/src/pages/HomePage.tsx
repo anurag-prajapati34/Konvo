@@ -13,6 +13,7 @@ const HomePage = () => {
   const dispatch = useDispatch();
 
   const userId = useSelector((state: RootState) => state.auth.user.userId);
+  console.log("user id : ",userId);
   useEffect(() => {
     socket.connect();
     socket.on("connect", () => {
@@ -25,7 +26,9 @@ const HomePage = () => {
     });
 
     return () => {
-      socket.disconnect();
+      
+      socket.off("connect");
+      socket.off("active-users");
     };
   }, []);
 

@@ -13,3 +13,20 @@
 .dark{
   background:black
 }
+
+.sender{
+ background-color: white;
+ padding: 6px;
+ border-radius: 4px;
+ box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+ text-align: end;
+}
+
+.reciever{
+ background-color: var(--primary-color);
+ box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+ padding: 6px;
+ border-radius: 4px;
+ text-align: start;
+ color: white;
+}

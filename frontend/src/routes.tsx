@@ -11,14 +11,18 @@ const routes=createBrowserRouter([
 
     {
         path:"/",
+        element:<App/>
+    },
+    {
+        path:"/home",
         element:<HomePage/>,
         children:[
             {
-                path:'/',
+                path:'/home',
                 element:<WelcomeChatScreen/>
             },
             {
-                path:'/chat',
+                path:'/home/chat',
                 element:<ChatScreen/>
             }
         ]

@@ -20,6 +20,7 @@ const navigate=useNavigate();
     socket.emit("new-message", message);
   };
 
+
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_SERVER_URL}/api/auth/user/me`, {
@@ -27,6 +28,8 @@ const navigate=useNavigate();
       })
       .then((res) => {
         dispatch(setUserCredentials(res.data.user));
+        navigate('/home');
+
       })
       .catch((err) => {
         console.log("user error:", err);
@@ -69,7 +72,7 @@ const navigate=useNavigate();
       <h1>Home page</h1>
       <h1>Hello{user ? user.name : "developer"}</h1>
       <h1>user logedIN : {isLogedIn ? "YES" : "NO"}</h1>
-      <h1 className="text-2xl text-green-600">Active users 🟢</h1>
+      {/* <h1 className="text-2xl text-green-600">Active users 🟢</h1>
       <div className="text-black">
         {Object.keys(activeUsers).map((key) => {
           return (
@@ -124,7 +127,7 @@ const navigate=useNavigate();
                       </div>
                   )
                 })
-              }
+              } */}
     </>
   );
 }
