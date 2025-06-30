@@ -22,21 +22,54 @@ const activeUsers={}
     io.on('connection',(socket)=>{
         
         const socketId=socket.id;
+        socket.join(socketId);
         console.log("Someone Connected 🤝 -> ",socketId);
-        activeUsers[socketId]=socket.id;
-        io.emit('active-users',activeUsers);
-        socket.on('new-message',(message)=>{
-            io.emit('message',message)
+
+        let id;
+        socket.on('userId',(userId)=>{
+            activeUsers[userId]=socketId;
+            id=userId;
+            io.emit('active-users',activeUsers);
         })
-        socket.on("private-message",(data)=>{
-            console.log("private message data : ",data)
-            const {recieverId,senderId,message}=data;
-            io.to(recieverId).emit('private-message',data)
+        
+        socket.on("chat-message",(data)=>{
+            const {recieverId,senderId,message,timestamp}=data;
+            console.log("chat message data is ",{
+                recieverId,
+                senderId,
+                message,
+                timestamp
+            });
+            console.log({senderId,recieverId});
+            console.log(activeUsers);
+            const recieverSocketId=activeUsers[recieverId];
+            const senderSocketId=activeUsers[senderId];
+
+            console.log({recieverSocketId,senderSocketId})
+            
+            io.to(recieverSocketId).emit('chat-message',{recieverId,senderId,message,timestamp});
+            io.to(senderSocketId).emit('chat-message',{recieverId,senderId,message,timestamp});
+            
+            
+        })
+
+        
+        
 
 
-        })
+
+
+        // socket.on('new-message',(message)=>{
+        //     io.emit('message',message)
+        // })
+        // socket.on("private-message",(data)=>{
+        //     console.log("private message data : ",data)
+        //     const {recieverId,senderId,message}=data;
+        //     io.to(recieverId).emit('private-message',data)
+        // })
         socket.on('disconnect',()=>{
-            delete activeUsers[socketId];
+          
+            delete activeUsers[id];
             console.log(" Disconnected -> ❌",socketId)
             io.emit('active-users',activeUsers);
         })
