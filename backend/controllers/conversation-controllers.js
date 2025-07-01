@@ -1,5 +1,5 @@
-
 const Conversation = require("../models/conversation-model");
+const Message = require("../models/message-model");
 
 const startConversation = async (req, res) => {
   try {
@@ -29,7 +29,7 @@ const startConversation = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Conversation established successfully",
-      conversation: conversation,
+      conversation: newConverSation,
     });
   } catch (error) {
     return res.status(500).json({
@@ -40,4 +40,40 @@ const startConversation = async (req, res) => {
   }
 };
 
-module.exports = { startConversation };
+const getConversation = async (req, res) => {
+  try {
+    const conversationId = req.query?.conversationId;
+    const allConversationMessages = await Message.find({
+      conversationId: conversationId,
+    }).sort({ timestamp: -1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "Conversation found successfully",
+      conversations: allConversationMessages,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+const addMessageToDB = async (conversationId, messageData) => {
+  try {
+    const newMessage = new Message({
+      conversationId: conversationId,
+      ...messageData,
+    });
+
+    await newMessage.save();
+
+    return newMessage;
+  } catch (error) {
+    return null;
+  }
+};
+
+module.exports = { startConversation, getConversation, addMessageToDB };

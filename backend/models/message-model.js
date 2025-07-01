@@ -20,6 +20,10 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    timestamp:{
+      type:Date,
+      default:Date.now
+    },
 
     readBy: [
       {
