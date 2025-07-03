@@ -6,9 +6,11 @@ import socket from "@/socket/socket";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import MessageCard from "./MessageCard";
+import { getConversations, startConversation } from "@/api/conversationApi";
 
 const ChatScreen = () => {
   const { recieverId, recieverSocketId } = useLocation().state;
+  const [conversationId, setConversationId] = useState<string>();
   const userId = useSelector((state: RootState) => state.auth.user.userId);
   console.log("chat screen");
   console.log("recieverId", recieverId);
@@ -37,11 +39,11 @@ const ChatScreen = () => {
 
   useEffect(() => {
     socket.on("chat-message", (data) => {
-      const { senderId, message } = data;
+      const { sender } = data;
 
-      console.log("one message got");
+      console.log("one message got",data);
 
-      if (senderId === recieverId || senderId === userId) {
+      if (sender === recieverId || sender === userId) {
         console.log("chat message data is ", data);
         setMessages((prev) => [...prev, data]);
       }
@@ -50,8 +52,25 @@ const ChatScreen = () => {
     return () => {
       socket.off("chat-message");
     };
-  }, [recieverSocketId]);
+  }, [recieverId,userId,recieverSocketId]);
 
+  useEffect(() => {
+    //start conversation
+
+    startConversation([userId, recieverId]).then((conversation) => {
+      console.log({ conversation });
+      setConversationId(conversation._id);
+    });
+  }, [recieverId,userId]);
+
+  useEffect(() => {
+    if (conversationId) {
+      getConversations(conversationId).then((res) => {
+        console.log("All Conversations ->", res);
+        setMessages(res);
+      });
+    }
+  }, [conversationId,userId,recieverId]);
 
   const handleSendMessage = () => {
     socket.emit("chat-message", {
@@ -59,6 +78,7 @@ const ChatScreen = () => {
       senderId: userId,
       message: newMessage,
       timestamp: Date.now(),
+      conversationId,
     });
   };
   return (
@@ -69,6 +89,8 @@ const ChatScreen = () => {
         recieverName={recieverName}
       />
       <div className="w-full  flex-1 p-2 flex flex-col justify-between gap-4 ">
+      <h1>socket id: {socket.id}{socket.disconnected?"disconnected":"connected"}</h1>
+      <h1>reciver id : {recieverSocketId}</h1>
         {/* <h1 className="font-bold text-blue-400">My id :{userId}</h1>
         <h1 className="font-bold text-red-400 ">reciver id :{recieverId}</h1>
         <h1 className="font-bold text-blue-400">
@@ -81,18 +103,27 @@ const ChatScreen = () => {
         <h1>Messages are --</h1> */}
         <div className="w-full   flex flex-col gap-2 overflow-y-auto ">
           {messages &&
-            messages.map((msg) => (
-              console.log({msg}),
-              <div
-                key={msg?.timestamp}
-                className={`${
-                  msg?.senderId === userId ? "justify-end" : "justify-start"
-                } flex w-full `}
-              >
-                <MessageCard message={msg?.message} recieverId={recieverId} senderId={msg?.senderId} timestamp={msg?.timestamp} userId={userId}/>
-               
-              </div>
-            ))}
+            messages.map(
+              (msg) => (
+                
+                (
+                  <div
+                    key={msg?.timestamp}
+                    className={`${
+                      msg?.sender === userId ? "justify-end" : "justify-start"
+                    } flex w-full `}
+                  >
+                    <MessageCard
+                      message={msg?.message}
+                      recieverId={recieverId}
+                      senderId={msg?.sender}
+                      timestamp={msg?.timestamp}
+                      userId={userId}
+                    />
+                  </div>
+                )
+              )
+            )}
         </div>
 
         <div className="flex gap-2 items-center border-black border-2 rounded-md p-2 w-full">
