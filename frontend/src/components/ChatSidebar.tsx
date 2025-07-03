@@ -13,6 +13,7 @@ export const ChatSidebar = () => {
 
   const dispatch = useDispatch();
 
+  const userId=useSelector((state:RootState)=>state.auth.user.userId);
   return (
     <div
       className={`${theme} w-1/4 h-screen border-r-[1px] border-slate-500 p-2 text-start overflow-y-scroll`}
@@ -20,8 +21,9 @@ export const ChatSidebar = () => {
       <h1 className="text-2xl font-bold text-center">Chats</h1>
       
       {Object.keys(activeUsers).map((id) => {
-        return (
-          <ChatCard
+       
+          if(id!==userId){
+           return ( <ChatCard
             key={id}
             recieverId={id}
             recieverSocketId={activeUsers[id]}
@@ -31,8 +33,10 @@ export const ChatSidebar = () => {
             }
             messages={[]}
             lastMessage={"How are you"}
-          />
-        );
+          />)
+          }
+          
+       
       })}
     </div>
   );
