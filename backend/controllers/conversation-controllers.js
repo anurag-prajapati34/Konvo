@@ -7,10 +7,11 @@ const startConversation = async (req, res) => {
     participants.sort();
 
     const conversation = await Conversation.findOne({
-      participants: { $all: participants },
+      participants: {$all:participants },
     });
 
     if (conversation) {
+      console.log("Conversation already exists");
       return res.status(200).json({
         success: true,
         message: "Conversation established successfully",
@@ -40,9 +41,17 @@ const startConversation = async (req, res) => {
   }
 };
 
-const getConversation = async (req, res) => {
+const getConversations = async (req, res) => {
   try {
+   
     const conversationId = req.query?.conversationId;
+    console.log("conversation id is -> ", conversationId);
+    if(!conversationId){
+        return res.status(400).json({
+            success:false,
+            message:"Conversation id is required"
+        })
+    }
     const allConversationMessages = await Message.find({
       conversationId: conversationId,
     }).sort({ timestamp: -1 });
@@ -50,7 +59,7 @@ const getConversation = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Conversation found successfully",
-      conversations: allConversationMessages,
+      conversations: allConversationMessages.reverse(),
     });
   } catch (error) {
     return res.status(500).json({
@@ -63,17 +72,26 @@ const getConversation = async (req, res) => {
 
 const addMessageToDB = async (conversationId, messageData) => {
   try {
+    const { recieverId, senderId, message, timestamp } = messageData;
+
+    console.log("message data to add in db is -> ", messageData);
     const newMessage = new Message({
       conversationId: conversationId,
-      ...messageData,
+      reciever: recieverId,
+      sender: senderId,
+      message: message,
+      timestamp: timestamp,
     });
+
+    console.log("new message is -> ", newMessage);
 
     await newMessage.save();
 
     return newMessage;
   } catch (error) {
+    console.log("Error adding message to DB", error);
     return null;
   }
 };
 
-module.exports = { startConversation, getConversation, addMessageToDB };
+module.exports = { startConversation, getConversations, addMessageToDB };

@@ -1,3 +1,4 @@
+const { text } = require("express");
 const mongoose = require("mongoose");
 const MessageSchema = new mongoose.Schema(
   {
@@ -6,11 +7,8 @@ const MessageSchema = new mongoose.Schema(
       required: true,
     },
     message: {
-      text: String,
-      image: String,
-      file: String,
-      video: String,
-      audio: String,
+     type:String,
+     required:true
     },
     sender: {
       type: String,
