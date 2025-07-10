@@ -12,9 +12,9 @@ const ChatScreen = () => {
   const { recieverId, recieverSocketId } = useLocation().state;
   const [conversationId, setConversationId] = useState<string>();
   const userId = useSelector((state: RootState) => state.auth.user.userId);
-  console.log("chat screen");
-  console.log("recieverId", recieverId);
-  console.log("recieverSocketId", recieverSocketId);
+  // console.log("chat screen");
+  // console.log("recieverId", recieverId);
+  // console.log("recieverSocketId", recieverSocketId);
   const activeUsers = useSelector((state: RootState) => state.activeUsers);
 
   const [newMessage, setNewMessage] = useState("");
@@ -41,7 +41,7 @@ const ChatScreen = () => {
     socket.on("chat-message", (data) => {
       const { sender } = data;
 
-      console.log("one message got",data);
+      // console.log("one message got",data);
 
       if (sender === recieverId || sender === userId) {
         console.log("chat message data is ", data);
@@ -61,7 +61,7 @@ const ChatScreen = () => {
       console.log({ conversation });
       setConversationId(conversation._id);
     });
-  }, [recieverId,userId]);
+  }, [recieverId]);
 
   useEffect(() => {
     if (conversationId) {
