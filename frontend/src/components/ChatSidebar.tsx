@@ -1,43 +1,84 @@
-import { chats } from "@/assets/data";
+import type { RootState } from "@/redux/store";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatCard from "./ChatCard";
 import socket from "@/socket/socket";
-import type { AppDistpatch, RootState } from "@/redux/store";
+import {setChatList}from '@/redux/slices/chatSlice'
+const ChatSidebar = () => {
+  const theme = "light";
+  // const [chats, setChats] = useState([]);
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+const chats=useSelector((state:RootState)=>state.chats)
+const dispatch=useDispatch();
+  const getChats = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/api/conversation/chats`,
+        { params: { userId: currentUser.userId } }
+      );
 
-export const ChatSidebar = () => {
-  const theme = useSelector((state: RootState) => state.theme);
-  const activeUsers = useSelector((state: RootState) => state.activeUsers);
+      console.log("chats are ", res.data.chatList);
+      dispatch(setChatList(res.data.chatList));
+      
+    } catch (error) {
+      console.log("Error fetching chats", error);
+    }
+  };
 
-  console.log("active users form chatsidebar", activeUsers);
+  useEffect(() => {
+    getChats();
+  }, []);
 
-  const dispatch = useDispatch();
+  useEffect(() => {
+    socket.on("chat-message", (data) => {
+      console.log("message get by soemone", data);
+      
+      const updatedChats=chats.map((chat) => {
+        if (chat.conversationId === data.conversationId) {
+          return {
+            ...chat,
+            lastMessage: data,
+            unreadCount: chat.unreadCount + 1
+          }
+        }
+        return chat;
+      })
 
-  const userId=useSelector((state:RootState)=>state.auth.user.userId);
+      dispatch(setChatList(updatedChats));
+        
+       
+      });
+
+      
+      return () => {
+        socket.off("chat-message");
+      };
+    },[chats])
+
+  if (!chats) {
+    return <div>loading</div>;
+  }
   return (
     <div
       className={`${theme} w-1/4 h-screen border-r-[1px] border-slate-500 p-2 text-start overflow-y-scroll`}
     >
-      <h1 className="text-2xl font-bold text-center">Chats</h1>
-      
-      {Object.keys(activeUsers).map((id) => {
-       
-          if(id!==userId){
-           return ( <ChatCard
-            key={id}
-            recieverId={id}
-            recieverSocketId={activeUsers[id]}
-            name={"Someone"}
-            image={
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&w=1000&q=80"
-            }
-            messages={[]}
-            lastMessage={"How are you"}
-          />)
-          }
-          
-       
+      <h1 className="text-2xl font-bold text-center">Recent Chats</h1>
+
+      {chats.map((chat) => {
+        return (
+          <ChatCard
+            key={chat.conversationId}
+            recieverId={chat.participants[0]}
+            recieverSocketId={""}
+            lastMessage={chat.lastMessage ? chat.lastMessage.message : ""}
+            unreadCount={chat.unreadCount}
+            conversationId={chat.conversationId}
+          />
+        );
       })}
     </div>
   );
 };
+
+export default ChatSidebar;
