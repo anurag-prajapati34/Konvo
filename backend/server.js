@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
     const senderSocketId = activeUsers[senderId];
     console.log("sender socket id is ", senderSocketId);
     io.to(recieverSocketId).emit("chat-message", newMessage);
-    io.to(senderSocketId).emit("chat-message", newMessage);
+    io.to(senderSocketId).emit("chat-message-sender", newMessage);
   });
 
   // socket.on('new-message',(message)=>{

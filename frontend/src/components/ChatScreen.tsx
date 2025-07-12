@@ -40,14 +40,23 @@ const ChatScreen = () => {
 
       // console.log("one message got",data);
 
-      if (sender === recieverId || sender === userId) {
+      if (sender === recieverId ) {
         console.log("chat message data is ", data);
         setMessages((prev) => [...prev, data]);
       }
     });
 
+    socket.on("chat-message-sender",(data)=>{
+      console.log("message back to me", data);
+      if( data.sender === userId){
+        setMessages((prev) => [...prev, data]);
+      }
+     
+    })
+
     return () => {
       socket.off("chat-message");
+      socket.off("chat-message-sender");
     };
   }, [recieverId, userId, recieverSocketId]);
 
