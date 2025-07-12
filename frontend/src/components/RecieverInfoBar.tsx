@@ -11,7 +11,7 @@ interface RecieverInfoBarProps{
 export const RecieverInfoBar = ({recieverImage,recieverName,recieverId}:RecieverInfoBarProps) => {
     const isOnline=true;
   return (
-    <div className='bg-white p-2 text-start flex gap-2 items-center'>
+    <div className='bg-white p-2 text-start flex gap-2 items-center sticky top-0'>
 
         <Avatar image={recieverImage}/>
         <div>

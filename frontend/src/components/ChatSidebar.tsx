@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatCard from "./ChatCard";
 import socket from "@/socket/socket";
-import {setChatList}from '@/redux/slices/chatSlice'
+import { setChatList } from "@/redux/slices/chatSlice";
+import Search from "./Search";
+import { ChatSidebarHeader } from "./ChatSidebarHeader";
 const ChatSidebar = () => {
   const theme = "light";
-  // const [chats, setChats] = useState([]);
   const currentUser = useSelector((state: RootState) => state.auth.user);
-const chats=useSelector((state:RootState)=>state.chats)
-const dispatch=useDispatch();
+  const chats = useSelector((state: RootState) => state.chats);
+  const dispatch = useDispatch();
   const getChats = async () => {
     try {
       const res = await axios.get(
@@ -20,7 +21,6 @@ const dispatch=useDispatch();
 
       console.log("chats are ", res.data.chatList);
       dispatch(setChatList(res.data.chatList));
-      
     } catch (error) {
       console.log("Error fetching chats", error);
     }
@@ -33,50 +33,50 @@ const dispatch=useDispatch();
   useEffect(() => {
     socket.on("chat-message", (data) => {
       console.log("message get by soemone", data);
-      
-      const updatedChats=chats.map((chat) => {
+
+      const updatedChats = chats.map((chat) => {
         if (chat.conversationId === data.conversationId) {
           return {
             ...chat,
             lastMessage: data,
-            unreadCount: chat.unreadCount + 1
-          }
+            unreadCount: chat.unreadCount + 1,
+          };
         }
         return chat;
-      })
-
-      dispatch(setChatList(updatedChats));
-        
-       
       });
 
-      
-      return () => {
-        socket.off("chat-message");
-      };
-    },[chats])
+      dispatch(setChatList(updatedChats));
+    });
+
+    return () => {
+      socket.off("chat-message");
+    };
+  }, [chats]);
 
   if (!chats) {
     return <div>loading</div>;
   }
   return (
     <div
-      className={`${theme} w-1/4 h-screen border-r-[1px] border-slate-500 p-2 text-start overflow-y-scroll`}
+      className={`${theme} w-1/4 h-screen border-r-[1px] shadow-sm p-2 text-start overflow-y-scroll sticky top-0`}
     >
-      <h1 className="text-2xl font-bold text-center">Recent Chats</h1>
-
-      {chats.map((chat) => {
-        return (
-          <ChatCard
-            key={chat.conversationId}
-            recieverId={chat.participants[0]}
-            recieverSocketId={""}
-            lastMessage={chat.lastMessage ? chat.lastMessage.message : ""}
-            unreadCount={chat.unreadCount}
-            conversationId={chat.conversationId}
-          />
-        );
-      })}
+      <ChatSidebarHeader />
+      <div className="mt-2"></div>
+      <Search />
+      <div className="w-full overflow-auto mt-4">
+        {chats.map((chat) => {
+          return (
+            <ChatCard
+              key={chat.conversationId}
+              recieverId={chat.participants[0]}
+              recieverSocketId={""}
+              lastMessage={chat.lastMessage ? chat.lastMessage.message : ""}
+              unreadCount={chat.unreadCount}
+              conversationId={chat.conversationId}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

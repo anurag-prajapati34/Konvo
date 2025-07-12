@@ -5,18 +5,15 @@ import { getUserProfile } from "../api/userApi";
 import socket from "@/socket/socket";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
-import MessageCard from "./MessageCard";
+import MessageCard from "./SenderMessageCard";
 import { getConversations, startConversation } from "@/api/conversationApi";
+import SenderMessageCard from "./SenderMessageCard";
+import RecieverMessageCard from "./RecieverMessageCard";
 
 const ChatScreen = () => {
   const { recieverId, recieverSocketId } = useLocation().state;
   const [conversationId, setConversationId] = useState<string>();
   const userId = useSelector((state: RootState) => state.auth.user.userId);
-  // console.log("chat screen");
-  // console.log("recieverId", recieverId);
-  // console.log("recieverSocketId", recieverSocketId);
-  const activeUsers = useSelector((state: RootState) => state.activeUsers);
-
   const [newMessage, setNewMessage] = useState("");
 
   const [recieverImage, setRecieverImage] = useState<string>(
@@ -52,7 +49,7 @@ const ChatScreen = () => {
     return () => {
       socket.off("chat-message");
     };
-  }, [recieverId,userId,recieverSocketId]);
+  }, [recieverId, userId, recieverSocketId]);
 
   useEffect(() => {
     //start conversation
@@ -70,7 +67,11 @@ const ChatScreen = () => {
         setMessages(res);
       });
     }
-  }, [conversationId,userId,recieverId]);
+  }, [conversationId, userId, recieverId]);
+
+  const handleScrollDown = () => {
+    window.scrollTo(0, document.body.scrollHeight);
+  };
 
   const handleSendMessage = () => {
     socket.emit("chat-message", {
@@ -80,63 +81,65 @@ const ChatScreen = () => {
       timestamp: Date.now(),
       conversationId,
     });
+
+    handleScrollDown();
   };
   return (
-    <div className=" bg-gray-200 w-full h-[100vh] flex flex-col">
+    <div className=" bg-gray-200 w-full  flex flex-col">
       <RecieverInfoBar
         recieverId={recieverId}
         recieverImage={recieverImage}
         recieverName={recieverName}
       />
-      <div className="w-full  flex-1 p-2 flex flex-col justify-between gap-4 ">
-      <h1>socket id: {socket.id}{socket.disconnected?"disconnected":"connected"}</h1>
-      <h1>reciver id : {recieverSocketId}</h1>
-        {/* <h1 className="font-bold text-blue-400">My id :{userId}</h1>
-        <h1 className="font-bold text-red-400 ">reciver id :{recieverId}</h1>
-        <h1 className="font-bold text-blue-400">
-          My socketid :{activeUsers[userId]}
+      <div className="w-full  flex-1 p-2 flex flex-col justify-between gap-4 realative">
+        {/* <h1>
+          socket id: {socket.id}
+          {socket.disconnected ? "disconnected" : "connected"}
         </h1>
-        <h1 className="font-bold text-red-400 ">
-          reciver socketid :{activeUsers[recieverId]}
-        </h1>
-        <h1>{recieverName}</h1>
-        <h1>Messages are --</h1> */}
-        <div className="w-full   flex flex-col gap-2 overflow-y-auto ">
-          {messages &&
-            messages.map(
-              (msg) => (
-                
-                (
-                  <div
-                    key={msg?.timestamp}
-                    className={`${
-                      msg?.sender === userId ? "justify-end" : "justify-start"
-                    } flex w-full `}
-                  >
-                    <MessageCard
-                      message={msg?.message}
-                      recieverId={recieverId}
-                      senderId={msg?.sender}
-                      timestamp={msg?.timestamp}
-                      userId={userId}
-                    />
-                  </div>
-                )
-              )
-            )}
-        </div>
+        <h1>reciver id : {recieverSocketId}</h1> */}
 
-        <div className="flex gap-2 items-center border-black border-2 rounded-md p-2 w-full">
+        <div className="w-full   flex flex-col gap-4 overflow-y-auto flex-1 ">
+          {messages &&
+            messages.map((msg) => (
+              <div
+                key={msg?.timestamp}
+                className={`${
+                  msg?.sender === userId ? "justify-end" : "justify-start"
+                } flex w-full `}
+              >
+                {msg.sender === userId ? (
+                  <SenderMessageCard
+                    message={msg?.message}
+                    recieverId={recieverId}
+                    senderId={msg?.sender}
+                    timestamp={msg?.timestamp}
+                    userId={userId}
+                  />
+                ) : (
+                  <RecieverMessageCard
+                    message={msg?.message}
+                    recieverId={recieverId}
+                    senderId={msg?.sender}
+                    timestamp={msg?.timestamp}
+                    userId={userId}
+                  />
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+      <div className="sticky bottom-1 px-4 py-1 ">
+        <div className="flex gap-2 items-center border-[var(--primary-color)] border-1 shadow-sm rounded-full p-2 w-full m-auto   bottom-1 bg-white overflow-hidden">
           <input
             onChange={(e) => {
               setNewMessage(e.target.value);
             }}
             placeholder="Type a message"
-            className="flex-1 h-full"
+            className="flex-1 h-full outline-none"
           />
           <button
             onClick={handleSendMessage}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-full"
           >
             Send
           </button>
